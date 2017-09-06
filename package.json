@@ -1,0 +1,24 @@
+{
+  "name": "ab-geth-worker",
+  "version": "0.1.0",
+  "description": "sqs worker to send tx",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acebusters/geth-worker.git"
+  },
+  "author": "johannbarbie@me.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acebusters/geth-worker/issues"
+  },
+  "homepage": "https://github.com/acebusters/geth-worker#readme",
+  "dependencies": {
+    "pusher": "^1.5.1",
+    "sqs-consumer": "^3.7.0",
+    "web3": "^1.0.0-beta.18"
+  }
+}
