@@ -3,11 +3,10 @@ const AWS = require('aws-sdk');
 const Web3 = require('web3');
 const Pusher = require('pusher');
 
-var web3 = new Web3();
-var web3Provider = new web3.providers.HttpProvider('url');
-web3 = new Web3(web3Provider);
+const web3 = new Web3();
+web3.setProvider(new web3.providers.HttpProvider('url'));
 
-var pusher = new Pusher({
+const pusher = new Pusher({
   appId: '',
   key: '',
   secret: '',
@@ -18,37 +17,38 @@ var pusher = new Pusher({
 AWS.config.update({
   region: 'eu-west-1',
   accessKeyId: '',
-  secretAccessKey: ''
+  secretAccessKey: '',
 });
 
 const app = Consumer.create({
   queueUrl: 'https://sqs.eu-west-1.amazonaws.com/xxx/tx.fifo',
   handleMessage: (message, done) => {
-  	console.log(message.Body);
-  	var signerAddr;
-  	const txObj = JSON.parse(message.Body);
-  	txObj.from = '';
-  	txObj.value = 0;
-  	if (txObj.signerAddr) {
-      signerAddr = txObj.signerAddr;
+    console.log(message.Body);
+    const txObj = {
+      ...JSON.parse(message.Body),
+      from: '',
+      value: 0,
+    };
+    const signerAddr = txObj.signerAddr;
+    if (txObj.signerAddr) {
       delete txObj.signerAddr;
-  	}
-  	web3.eth.sendTransaction(txObj, function(error, txHash) {
-  	  if (error) {
-  	  	console.log(error);
-  	  	return;
-  	  }
-  	  if (signerAddr) {
-	    const rsp = pusher.trigger(signerAddr, 'update', {
+    }
+    web3.eth.sendTransaction(txObj, (error, txHash) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      if (signerAddr) {
+        const rsp = pusher.trigger(signerAddr, 'update', {
           type: 'txHash',
           payload: txHash,
         });
         console.log('pusher', rsp);
-  	  }
-  	  console.log(txHash);
-  	  done();
-  	});
-  }
+      }
+      console.log(txHash);
+      done();
+    });
+  },
 });
 
 app.on('error', (err) => {
