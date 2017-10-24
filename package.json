@@ -4,6 +4,7 @@
   "description": "sqs worker to send tx",
   "main": "index.js",
   "scripts": {
+    "start": "forever index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,7 @@
   "homepage": "https://github.com/acebusters/geth-worker#readme",
   "dependencies": {
     "aws-sdk": "^2.139.0",
+    "forever": "^0.15.3",
     "pusher": "^1.5.1",
     "sqs-consumer": "^3.7.0",
     "web3": "^1.0.0-beta.18"

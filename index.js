@@ -26,11 +26,10 @@ const app = Consumer.create({
   queueUrl: conf.queueUrl,
   handleMessage: (message, done) => {
     console.log(message.Body);
-    const txObj = {
-      ...JSON.parse(message.Body),
+    const txObj = Object.assing(JSON.parse(message.Body), {
       from: '',
       value: 0,
-    };
+    });
     const signerAddr = txObj.signerAddr;
     if (txObj.signerAddr) {
       delete txObj.signerAddr;
