@@ -3,25 +3,27 @@ const AWS = require('aws-sdk');
 const Web3 = require('web3');
 const Pusher = require('pusher');
 
+const conf = require('./app.config');
+
 const web3 = new Web3();
-web3.setProvider(new web3.providers.HttpProvider('url'));
+web3.setProvider(new web3.providers.HttpProvider(conf.providerUrl));
 
 const pusher = new Pusher({
-  appId: '',
-  key: '',
-  secret: '',
+  appId: conf.pusherAppId,
+  key: conf.pusherKey,
+  secret: conf.pusherSecret,
   cluster: 'eu',
   encrypted: true,
 });
 
 AWS.config.update({
-  region: 'eu-west-1',
-  accessKeyId: '',
-  secretAccessKey: '',
+  region: conf.awsRegion,
+  accessKeyId: conf.awsAccessKeyId,
+  secretAccessKey: conf.awsSecretAccessKey,
 });
 
 const app = Consumer.create({
-  queueUrl: 'https://sqs.eu-west-1.amazonaws.com/xxx/tx.fifo',
+  queueUrl: conf.queueUrl,
   handleMessage: (message, done) => {
     console.log(message.Body);
     const txObj = {
