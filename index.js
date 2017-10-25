@@ -22,32 +22,34 @@ AWS.config.update({
   secretAccessKey: conf.awsSecretAccessKey,
 });
 
+const handleMessage = (message, done) => {
+  console.log('tx', message.Body);
+  const txObj = JSON.parse(message.Body);
+  txObj.value = 0;
+  const signerAddr = txObj.signerAddr;
+  if (signerAddr) {
+    delete txObj.signerAddr;
+  }
+  web3.eth.sendTransaction(txObj, (error, txHash) => {
+    if (error) {
+      console.log('txError', error);
+      return;
+    }
+    if (signerAddr) {
+      const rsp = pusher.trigger(signerAddr, 'update', {
+        type: 'txHash',
+        payload: txHash,
+      });
+      console.log('pusher', rsp);
+    }
+    console.log('txHash', txHash);
+    done();
+  });
+};
+
 const app = Consumer.create({
   queueUrl: conf.queueUrl,
-  handleMessage: (message, done) => {
-    console.log('tx', message.Body);
-    const txObj = JSON.parse(message.Body);
-    txObj.value = 0;
-    const signerAddr = txObj.signerAddr;
-    if (signerAddr) {
-      delete txObj.signerAddr;
-    }
-    web3.eth.sendTransaction(txObj, (error, txHash) => {
-      if (error) {
-        console.log('txError', error);
-        return;
-      }
-      if (signerAddr) {
-        const rsp = pusher.trigger(signerAddr, 'update', {
-          type: 'txHash',
-          payload: txHash,
-        });
-        console.log('pusher', rsp);
-      }
-      console.log('txHash', txHash);
-      done();
-    });
-  },
+  handleMessage,
 });
 
 app.on('error', (err) => {
