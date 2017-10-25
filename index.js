@@ -25,18 +25,16 @@ AWS.config.update({
 const app = Consumer.create({
   queueUrl: conf.queueUrl,
   handleMessage: (message, done) => {
-    console.log(message.Body);
-    const txObj = Object.assing(JSON.parse(message.Body), {
-      from: '',
-      value: 0,
-    });
+    console.log('tx', message.Body);
+    const txObj = JSON.parse(message.Body);
+    txObj.value = 0;
     const signerAddr = txObj.signerAddr;
-    if (txObj.signerAddr) {
+    if (signerAddr) {
       delete txObj.signerAddr;
     }
     web3.eth.sendTransaction(txObj, (error, txHash) => {
       if (error) {
-        console.log(error);
+        console.log('txError', error);
         return;
       }
       if (signerAddr) {
@@ -46,7 +44,7 @@ const app = Consumer.create({
         });
         console.log('pusher', rsp);
       }
-      console.log(txHash);
+      console.log('txHash', txHash);
       done();
     });
   },
